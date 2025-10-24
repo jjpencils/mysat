@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Bitcoin, TrendingUp, TrendingDown } from "lucide-react";
 
 interface BitcoinPrice {
@@ -145,13 +146,13 @@ const BitcoinCalculator = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">THB</p>
-                  <p className="text-3xl font-bold text-gradient">
+                  <p className="text-xl md:text-3xl font-bold text-gradient">
                     ฿{price.thb.toLocaleString()}
                   </p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">USD</p>
-                  <p className="text-2xl font-bold text-secondary">
+                  <p className="text-lg md:text-2xl font-bold text-secondary">
                     ${price.usd.toLocaleString()}
                   </p>
                 </div>
@@ -183,6 +184,13 @@ const BitcoinCalculator = () => {
                   autoFocus
                   placeholder="กรอกจำนวนเงินบาท"
                 />
+                <Button 
+                  onClick={() => calculateFromThb(thb)}
+                  className="w-full"
+                  size="lg"
+                >
+                  คำนวณ
+                </Button>
               </div>
 
               {/* BTC */}
