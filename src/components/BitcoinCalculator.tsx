@@ -58,7 +58,7 @@ const BitcoinCalculator = () => {
   const handleSatoshiChange = (value: string) => {
     setSatoshi(value);
     const satoshiValue = parseFloat(value) || 0;
-    setBtc(String(satoshiValue / SATOSHI_PER_BTC));
+    setBtc((satoshiValue / SATOSHI_PER_BTC).toFixed(8));
   };
 
   const handleUsdChange = (value: string) => {
@@ -66,7 +66,7 @@ const BitcoinCalculator = () => {
     if (price) {
       const usdValue = parseFloat(value) || 0;
       const btcValue = usdValue / price.usd;
-      setBtc(String(btcValue));
+      setBtc(btcValue.toFixed(8));
       setSatoshi(String(btcValue * SATOSHI_PER_BTC));
     }
   };
@@ -76,7 +76,7 @@ const BitcoinCalculator = () => {
     if (price) {
       const thbValue = parseFloat(value) || 0;
       const btcValue = thbValue / price.thb;
-      setBtc(String(btcValue));
+      setBtc(btcValue.toFixed(8));
       setSatoshi(String(btcValue * SATOSHI_PER_BTC));
     }
   };
