@@ -44,21 +44,21 @@ const BitcoinCalculator = () => {
   useEffect(() => {
     if (price) {
       const btcValue = parseFloat(btc) || 0;
-      setUsd((btcValue * price.usd).toFixed(2));
-      setThb((btcValue * price.thb).toFixed(2));
+      setUsd(String(btcValue * price.usd));
+      setThb(String(btcValue * price.thb));
     }
   }, [btc, price]);
 
   const handleBtcChange = (value: string) => {
     setBtc(value);
     const btcValue = parseFloat(value) || 0;
-    setSatoshi((btcValue * SATOSHI_PER_BTC).toFixed(0));
+    setSatoshi(String(btcValue * SATOSHI_PER_BTC));
   };
 
   const handleSatoshiChange = (value: string) => {
     setSatoshi(value);
     const satoshiValue = parseFloat(value) || 0;
-    setBtc((satoshiValue / SATOSHI_PER_BTC).toFixed(8));
+    setBtc(String(satoshiValue / SATOSHI_PER_BTC));
   };
 
   const handleUsdChange = (value: string) => {
@@ -66,8 +66,8 @@ const BitcoinCalculator = () => {
     if (price) {
       const usdValue = parseFloat(value) || 0;
       const btcValue = usdValue / price.usd;
-      setBtc(btcValue.toFixed(8));
-      setSatoshi((btcValue * SATOSHI_PER_BTC).toFixed(0));
+      setBtc(String(btcValue));
+      setSatoshi(String(btcValue * SATOSHI_PER_BTC));
     }
   };
 
@@ -76,8 +76,8 @@ const BitcoinCalculator = () => {
     if (price) {
       const thbValue = parseFloat(value) || 0;
       const btcValue = thbValue / price.thb;
-      setBtc(btcValue.toFixed(8));
-      setSatoshi((btcValue * SATOSHI_PER_BTC).toFixed(0));
+      setBtc(String(btcValue));
+      setSatoshi(String(btcValue * SATOSHI_PER_BTC));
     }
   };
 
@@ -122,15 +122,15 @@ const BitcoinCalculator = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">USD</p>
-                  <p className="text-2xl font-bold text-gradient">
-                    ${price.usd.toLocaleString()}
+                  <p className="text-sm text-muted-foreground">THB</p>
+                  <p className="text-3xl font-bold text-gradient">
+                    ฿{price.thb.toLocaleString()}
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">THB</p>
+                  <p className="text-sm text-muted-foreground">USD</p>
                   <p className="text-2xl font-bold text-secondary">
-                    ฿{price.thb.toLocaleString()}
+                    ${price.usd.toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -146,6 +146,20 @@ const BitcoinCalculator = () => {
             </h2>
 
             <div className="grid gap-6">
+              {/* THB */}
+              <div className="space-y-2">
+                <Label htmlFor="thb" className="text-base text-foreground">
+                  Thai Baht (THB)
+                </Label>
+                <Input
+                  id="thb"
+                  type="number"
+                  value={thb}
+                  onChange={(e) => handleThbChange(e.target.value)}
+                  className="text-lg h-12 bg-input border-border text-foreground"
+                />
+              </div>
+
               {/* BTC */}
               <div className="space-y-2">
                 <Label htmlFor="btc" className="text-base text-foreground">
@@ -157,7 +171,6 @@ const BitcoinCalculator = () => {
                   value={btc}
                   onChange={(e) => handleBtcChange(e.target.value)}
                   className="text-lg h-12 bg-input border-border text-foreground"
-                  step="0.00000001"
                 />
               </div>
 
@@ -172,7 +185,6 @@ const BitcoinCalculator = () => {
                   value={satoshi}
                   onChange={(e) => handleSatoshiChange(e.target.value)}
                   className="text-lg h-12 bg-input border-border text-foreground"
-                  step="1"
                 />
               </div>
 
@@ -187,22 +199,6 @@ const BitcoinCalculator = () => {
                   value={usd}
                   onChange={(e) => handleUsdChange(e.target.value)}
                   className="text-lg h-12 bg-input border-border text-foreground"
-                  step="0.01"
-                />
-              </div>
-
-              {/* THB */}
-              <div className="space-y-2">
-                <Label htmlFor="thb" className="text-base text-foreground">
-                  Thai Baht (THB)
-                </Label>
-                <Input
-                  id="thb"
-                  type="number"
-                  value={thb}
-                  onChange={(e) => handleThbChange(e.target.value)}
-                  className="text-lg h-12 bg-input border-border text-foreground"
-                  step="0.01"
                 />
               </div>
             </div>
