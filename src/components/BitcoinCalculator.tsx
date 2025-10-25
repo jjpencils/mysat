@@ -20,6 +20,14 @@ const BitcoinCalculator = () => {
 
   const SATOSHI_PER_BTC = 100000000;
 
+  const formatNumber = (value: number): string => {
+    return value.toLocaleString('en-US', { maximumFractionDigits: 8 });
+  };
+
+  const parseNumber = (value: string): number => {
+    return parseFloat(value.replace(/,/g, '')) || 0;
+  };
+
   const resetFields = () => {
     setBtc("");
     setSatoshi("");
@@ -52,40 +60,40 @@ const BitcoinCalculator = () => {
 
   const calculateFromThb = (thbValue: string) => {
     if (price && thbValue) {
-      const thb = parseFloat(thbValue) || 0;
+      const thb = parseNumber(thbValue);
       const btcValue = thb / price.thb;
-      setBtc(btcValue.toFixed(8));
-      setSatoshi(String(btcValue * SATOSHI_PER_BTC));
-      setUsd(String(btcValue * price.usd));
+      setBtc(formatNumber(btcValue));
+      setSatoshi(formatNumber(btcValue * SATOSHI_PER_BTC));
+      setUsd(formatNumber(btcValue * price.usd));
     }
   };
 
   const calculateFromBtc = (btcValue: string) => {
     if (price && btcValue) {
-      const btc = parseFloat(btcValue) || 0;
-      setSatoshi(String(btc * SATOSHI_PER_BTC));
-      setUsd(String(btc * price.usd));
-      setThb(String(btc * price.thb));
+      const btc = parseNumber(btcValue);
+      setSatoshi(formatNumber(btc * SATOSHI_PER_BTC));
+      setUsd(formatNumber(btc * price.usd));
+      setThb(formatNumber(btc * price.thb));
     }
   };
 
   const calculateFromSatoshi = (satoshiValue: string) => {
     if (price && satoshiValue) {
-      const satoshi = parseFloat(satoshiValue) || 0;
+      const satoshi = parseNumber(satoshiValue);
       const btcValue = satoshi / SATOSHI_PER_BTC;
-      setBtc(btcValue.toFixed(8));
-      setUsd(String(btcValue * price.usd));
-      setThb(String(btcValue * price.thb));
+      setBtc(formatNumber(btcValue));
+      setUsd(formatNumber(btcValue * price.usd));
+      setThb(formatNumber(btcValue * price.thb));
     }
   };
 
   const calculateFromUsd = (usdValue: string) => {
     if (price && usdValue) {
-      const usd = parseFloat(usdValue) || 0;
+      const usd = parseNumber(usdValue);
       const btcValue = usd / price.usd;
-      setBtc(btcValue.toFixed(8));
-      setSatoshi(String(btcValue * SATOSHI_PER_BTC));
-      setThb(String(btcValue * price.thb));
+      setBtc(formatNumber(btcValue));
+      setSatoshi(formatNumber(btcValue * SATOSHI_PER_BTC));
+      setThb(formatNumber(btcValue * price.thb));
     }
   };
 
@@ -180,9 +188,14 @@ const BitcoinCalculator = () => {
                 </Label>
                 <Input
                   id="thb"
-                  type="number"
+                  type="text"
                   value={thb}
-                  onChange={(e) => setThb(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/,/g, '');
+                    if (value === '' || !isNaN(Number(value))) {
+                      setThb(value ? formatNumber(parseNumber(value)) : '');
+                    }
+                  }}
                   onKeyPress={(e) => handleKeyPress(e, 'thb')}
                   className="text-lg h-12 bg-input border-border text-foreground"
                   autoFocus
@@ -214,9 +227,14 @@ const BitcoinCalculator = () => {
                 </Label>
                 <Input
                   id="btc"
-                  type="number"
+                  type="text"
                   value={btc}
-                  onChange={(e) => setBtc(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/,/g, '');
+                    if (value === '' || !isNaN(Number(value))) {
+                      setBtc(value ? formatNumber(parseNumber(value)) : '');
+                    }
+                  }}
                   onKeyPress={(e) => handleKeyPress(e, 'btc')}
                   className="text-lg h-12 bg-input border-border text-foreground"
                   placeholder="กรอกจำนวน BTC"
@@ -247,9 +265,14 @@ const BitcoinCalculator = () => {
                 </Label>
                 <Input
                   id="satoshi"
-                  type="number"
+                  type="text"
                   value={satoshi}
-                  onChange={(e) => setSatoshi(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/,/g, '');
+                    if (value === '' || !isNaN(Number(value))) {
+                      setSatoshi(value ? formatNumber(parseNumber(value)) : '');
+                    }
+                  }}
                   onKeyPress={(e) => handleKeyPress(e, 'satoshi')}
                   className="text-lg h-12 bg-input border-border text-foreground"
                   placeholder="กรอกจำนวน Satoshi"
@@ -280,9 +303,14 @@ const BitcoinCalculator = () => {
                 </Label>
                 <Input
                   id="usd"
-                  type="number"
+                  type="text"
                   value={usd}
-                  onChange={(e) => setUsd(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/,/g, '');
+                    if (value === '' || !isNaN(Number(value))) {
+                      setUsd(value ? formatNumber(parseNumber(value)) : '');
+                    }
+                  }}
                   onKeyPress={(e) => handleKeyPress(e, 'usd')}
                   className="text-lg h-12 bg-input border-border text-foreground"
                   placeholder="กรอกจำนวนดอลลาร์"
