@@ -20,6 +20,13 @@ const BitcoinCalculator = () => {
 
   const SATOSHI_PER_BTC = 100000000;
 
+  const resetFields = () => {
+    setBtc("");
+    setSatoshi("");
+    setUsd("");
+    setThb("");
+  };
+
   useEffect(() => {
     const fetchPrice = async () => {
       try {
@@ -109,14 +116,11 @@ const BitcoinCalculator = () => {
       <div className="w-full max-w-2xl space-y-6">
         {/* Header */}
         <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3">
-            <Bitcoin className="w-12 h-12 text-primary animate-glow" />
-            <h1 className="text-4xl md:text-5xl font-bold text-gradient">
-              Bitcoin Calculator
-            </h1>
-          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-gradient">
+            Bitcoin Calculator
+          </h1>
           <p className="text-muted-foreground text-lg">
-            แปลงหน่วย Bitcoin และ Satoshi แบบเรียลไทม์
+            แปลงหน่วย Bitcoin และ Satoshi แบบ real-time
           </p>
         </div>
 
@@ -184,13 +188,23 @@ const BitcoinCalculator = () => {
                   autoFocus
                   placeholder="กรอกจำนวนเงินบาท"
                 />
-                <Button 
-                  onClick={() => calculateFromThb(thb)}
-                  className="w-full"
-                  size="lg"
-                >
-                  คำนวณ
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    onClick={() => calculateFromThb(thb)}
+                    className="w-full"
+                    size="lg"
+                  >
+                    คำนวณ
+                  </Button>
+                  <Button 
+                    onClick={resetFields}
+                    variant="outline"
+                    className="w-full"
+                    size="lg"
+                  >
+                    ล้างตัวเลข
+                  </Button>
+                </div>
               </div>
 
               {/* BTC */}
@@ -207,6 +221,23 @@ const BitcoinCalculator = () => {
                   className="text-lg h-12 bg-input border-border text-foreground"
                   placeholder="กรอกจำนวน BTC"
                 />
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    onClick={() => calculateFromBtc(btc)}
+                    className="w-full"
+                    size="lg"
+                  >
+                    คำนวณ
+                  </Button>
+                  <Button 
+                    onClick={resetFields}
+                    variant="outline"
+                    className="w-full"
+                    size="lg"
+                  >
+                    ล้างตัวเลข
+                  </Button>
+                </div>
               </div>
 
               {/* Satoshi */}
@@ -223,6 +254,23 @@ const BitcoinCalculator = () => {
                   className="text-lg h-12 bg-input border-border text-foreground"
                   placeholder="กรอกจำนวน Satoshi"
                 />
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    onClick={() => calculateFromSatoshi(satoshi)}
+                    className="w-full"
+                    size="lg"
+                  >
+                    คำนวณ
+                  </Button>
+                  <Button 
+                    onClick={resetFields}
+                    variant="outline"
+                    className="w-full"
+                    size="lg"
+                  >
+                    ล้างตัวเลข
+                  </Button>
+                </div>
               </div>
 
               {/* USD */}
@@ -239,6 +287,23 @@ const BitcoinCalculator = () => {
                   className="text-lg h-12 bg-input border-border text-foreground"
                   placeholder="กรอกจำนวนดอลลาร์"
                 />
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    onClick={() => calculateFromUsd(usd)}
+                    className="w-full"
+                    size="lg"
+                  >
+                    คำนวณ
+                  </Button>
+                  <Button 
+                    onClick={resetFields}
+                    variant="outline"
+                    className="w-full"
+                    size="lg"
+                  >
+                    ล้างตัวเลข
+                  </Button>
+                </div>
               </div>
             </div>
 
