@@ -243,7 +243,7 @@ const BitcoinCalculator = () => {
               {/* Satoshi */}
               <div className="space-y-2">
                 <Label htmlFor="satoshi" className="text-base text-foreground">
-                  Satoshi (โตชิ)
+                  Satoshi (Sats)
                 </Label>
                 <Input
                   id="satoshi"
