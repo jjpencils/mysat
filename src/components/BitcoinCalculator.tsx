@@ -192,8 +192,14 @@ const BitcoinCalculator = () => {
                   value={thb}
                   onChange={(e) => {
                     const value = e.target.value.replace(/,/g, '');
-                    if (value === '' || !isNaN(Number(value))) {
-                      setThb(value ? formatNumber(parseNumber(value)) : '');
+                    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                      setThb(value);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const value = e.target.value.replace(/,/g, '');
+                    if (value && !isNaN(Number(value))) {
+                      setThb(formatNumber(parseNumber(value)));
                     }
                   }}
                   onKeyPress={(e) => handleKeyPress(e, 'thb')}
@@ -231,8 +237,14 @@ const BitcoinCalculator = () => {
                   value={btc}
                   onChange={(e) => {
                     const value = e.target.value.replace(/,/g, '');
-                    if (value === '' || !isNaN(Number(value))) {
-                      setBtc(value ? formatNumber(parseNumber(value)) : '');
+                    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                      setBtc(value);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const value = e.target.value.replace(/,/g, '');
+                    if (value && !isNaN(Number(value))) {
+                      setBtc(formatNumber(parseNumber(value)));
                     }
                   }}
                   onKeyPress={(e) => handleKeyPress(e, 'btc')}
@@ -269,8 +281,14 @@ const BitcoinCalculator = () => {
                   value={satoshi}
                   onChange={(e) => {
                     const value = e.target.value.replace(/,/g, '');
-                    if (value === '' || !isNaN(Number(value))) {
-                      setSatoshi(value ? formatNumber(parseNumber(value)) : '');
+                    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                      setSatoshi(value);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const value = e.target.value.replace(/,/g, '');
+                    if (value && !isNaN(Number(value))) {
+                      setSatoshi(formatNumber(parseNumber(value)));
                     }
                   }}
                   onKeyPress={(e) => handleKeyPress(e, 'satoshi')}
@@ -307,8 +325,14 @@ const BitcoinCalculator = () => {
                   value={usd}
                   onChange={(e) => {
                     const value = e.target.value.replace(/,/g, '');
-                    if (value === '' || !isNaN(Number(value))) {
-                      setUsd(value ? formatNumber(parseNumber(value)) : '');
+                    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                      setUsd(value);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const value = e.target.value.replace(/,/g, '');
+                    if (value && !isNaN(Number(value))) {
+                      setUsd(formatNumber(parseNumber(value)));
                     }
                   }}
                   onKeyPress={(e) => handleKeyPress(e, 'usd')}
