@@ -125,7 +125,7 @@ const BitcoinCalculator = () => {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl md:text-5xl font-bold text-gradient">
-            Bitcoin Calculator
+            THB/BTC/Sat/USD Converter
           </h1>
           <p className="text-muted-foreground text-lg">
             converter THB ⇄ BTC ⇄ SAT ⇄ USD แบบ real-time
@@ -176,10 +176,6 @@ const BitcoinCalculator = () => {
         {/* Calculator Card */}
         <Card className="p-6 bg-gradient-to-br from-card to-card/50 border-border/50 backdrop-blur">
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-foreground">
-              เครื่องคิดเลข
-            </h2>
-
             <div className="grid gap-6">
               {/* THB */}
               <div className="space-y-2">
@@ -273,7 +269,7 @@ const BitcoinCalculator = () => {
               {/* Satoshi */}
               <div className="space-y-2">
                 <Label htmlFor="satoshi" className="text-base text-foreground">
-                  Satoshi (Sats)
+                  Satoshi (Sat)
                 </Label>
                 <Input
                   id="satoshi"
