@@ -128,7 +128,7 @@ const BitcoinCalculator = () => {
             Bitcoin Calculator
           </h1>
           <p className="text-muted-foreground text-lg">
-            แปลงหน่วย Bitcoin และ Satoshi แบบ real-time
+            แปลงหน่วย Thai Baht &lt;&gt; Bitcoin &lt;&gt; Satoshi &lt;&gt; US Dollar แบบ real-time
           </p>
         </div>
 
