@@ -20,7 +20,19 @@ const BitcoinPriceChart = () => {
         const response = await fetch(
           "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=max&interval=daily"
         );
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
+        
+        // Check if prices data exists
+        if (!data || !data.prices || !Array.isArray(data.prices)) {
+          console.error("Invalid data format:", data);
+          setLoading(false);
+          return;
+        }
         
         // Convert data to chart format
         const formattedData: ChartDataPoint[] = data.prices.map((item: [number, number]) => ({
@@ -70,6 +82,16 @@ const BitcoinPriceChart = () => {
       <Card className="p-6 bg-gradient-to-br from-card to-card/50 border-border/50 backdrop-blur">
         <div className="flex items-center justify-center h-[400px]">
           <div className="text-muted-foreground">กำลังโหลดข้อมูลกราฟ...</div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (!chartData || chartData.length === 0) {
+    return (
+      <Card className="p-6 bg-gradient-to-br from-card to-card/50 border-border/50 backdrop-blur">
+        <div className="flex items-center justify-center h-[400px]">
+          <div className="text-muted-foreground">ไม่สามารถโหลดข้อมูลกราฟได้ กรุณาลองใหม่อีกครั้ง</div>
         </div>
       </Card>
     );
