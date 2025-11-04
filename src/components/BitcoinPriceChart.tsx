@@ -17,32 +17,34 @@ const BitcoinPriceChart = () => {
     const fetchHistoricalData = async () => {
       try {
         setLoading(true);
+        
+        // Use CoinCap API - higher rate limit and no API key required
         const response = await fetch(
-          "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=max&interval=daily"
+          "https://api.coincap.io/v2/assets/bitcoin/history?interval=d1"
         );
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
+        const result = await response.json();
         
-        // Check if prices data exists
-        if (!data || !data.prices || !Array.isArray(data.prices)) {
-          console.error("Invalid data format:", data);
+        // Check if data exists
+        if (!result || !result.data || !Array.isArray(result.data)) {
+          console.error("Invalid data format:", result);
           setLoading(false);
           return;
         }
         
         // Convert data to chart format
-        const formattedData: ChartDataPoint[] = data.prices.map((item: [number, number]) => ({
-          timestamp: item[0],
-          date: new Date(item[0]).toLocaleDateString('en-US', { 
+        const formattedData: ChartDataPoint[] = result.data.map((item: any) => ({
+          timestamp: item.time,
+          date: new Date(item.time).toLocaleDateString('en-US', { 
             year: 'numeric', 
             month: 'short',
             day: 'numeric'
           }),
-          price: Math.round(item[1])
+          price: Math.round(parseFloat(item.priceUsd))
         }));
 
         setChartData(formattedData);
@@ -143,7 +145,7 @@ const BitcoinPriceChart = () => {
         </div>
 
         <p className="text-sm text-muted-foreground text-center">
-          ข้อมูลจาก CoinGecko API (อัปเดตรายวัน)
+          ข้อมูลจาก CoinCap API (อัปเดตรายวัน)
         </p>
       </div>
     </Card>
