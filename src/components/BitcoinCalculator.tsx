@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Bitcoin, TrendingUp, TrendingDown } from "lucide-react";
+import BitcoinPriceChart from "./BitcoinPriceChart";
 
 interface BitcoinPrice {
   usd: number;
@@ -363,6 +364,9 @@ const BitcoinCalculator = () => {
             </div>
           </div>
         </Card>
+
+        {/* Price Chart */}
+        <BitcoinPriceChart />
 
         {/* Footer */}
         <p className="text-center text-sm text-muted-foreground">
