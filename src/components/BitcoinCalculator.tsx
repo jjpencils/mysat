@@ -125,7 +125,7 @@ const BitcoinCalculator = () => {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl md:text-5xl font-bold text-gradient">
-            THB → BTC Converter
+            THB ⇄ BTC Converter
           </h1>
           <p className="text-muted-foreground text-lg">
             convert THB ⇄ BTC ⇄ SAT ⇄ USD แบบ real-time
