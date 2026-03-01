@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Bitcoin, TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Trash2 } from "lucide-react";
 
 interface BitcoinPrice {
   usd: number;
@@ -11,12 +11,21 @@ interface BitcoinPrice {
   usd_24h_change: number;
 }
 
+interface BitcoinAverages {
+  avg7d: number;
+  avg30d: number;
+  avg100d: number;
+}
+
 const BitcoinCalculator = () => {
   const [price, setPrice] = useState<BitcoinPrice | null>(null);
+  const [averages, setAverages] = useState<BitcoinAverages | null>(null);
+  const [thbUsdRate, setThbUsdRate] = useState<number | null>(null);
   const [btc, setBtc] = useState<string>("");
   const [satoshi, setSatoshi] = useState<string>("");
   const [usd, setUsd] = useState<string>("");
   const [thb, setThb] = useState<string>("");
+  const [activeField, setActiveField] = useState<string | null>(null);
 
   const SATOSHI_PER_BTC = 100000000;
 
@@ -33,6 +42,7 @@ const BitcoinCalculator = () => {
     setSatoshi("");
     setUsd("");
     setThb("");
+    setActiveField(null);
   };
 
   useEffect(() => {
@@ -42,11 +52,13 @@ const BitcoinCalculator = () => {
           "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,thb&include_24hr_change=true"
         );
         const data = await response.json();
-        setPrice({
+        const btcPrice = {
           usd: data.bitcoin.usd,
           thb: data.bitcoin.thb,
           usd_24h_change: data.bitcoin.usd_24h_change,
-        });
+        };
+        setPrice(btcPrice);
+        setThbUsdRate(btcPrice.thb / btcPrice.usd);
       } catch (error) {
         console.error("Error fetching Bitcoin price:", error);
       }
@@ -57,65 +69,110 @@ const BitcoinCalculator = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const fetchAverages = async () => {
+      try {
+        const response = await fetch(
+          "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=100&interval=daily"
+        );
+        const data = await response.json();
+        const prices: number[] = data.prices.map((p: [number, number]) => p[1]);
+        
+        const last7 = prices.slice(-7);
+        const last30 = prices.slice(-30);
+        const last100 = prices;
 
-  const calculateFromThb = (thbValue: string) => {
-    if (price && thbValue) {
-      const thb = parseNumber(thbValue);
-      const btcValue = thb / price.thb;
-      setBtc(formatNumber(btcValue));
-      setSatoshi(formatNumber(btcValue * SATOSHI_PER_BTC));
-      setUsd(formatNumber(btcValue * price.usd));
-    }
-  };
+        const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
 
-  const calculateFromBtc = (btcValue: string) => {
-    if (price && btcValue) {
-      const btc = parseNumber(btcValue);
-      setSatoshi(formatNumber(btc * SATOSHI_PER_BTC));
-      setUsd(formatNumber(btc * price.usd));
-      setThb(formatNumber(btc * price.thb));
-    }
-  };
-
-  const calculateFromSatoshi = (satoshiValue: string) => {
-    if (price && satoshiValue) {
-      const satoshi = parseNumber(satoshiValue);
-      const btcValue = satoshi / SATOSHI_PER_BTC;
-      setBtc(formatNumber(btcValue));
-      setUsd(formatNumber(btcValue * price.usd));
-      setThb(formatNumber(btcValue * price.thb));
-    }
-  };
-
-  const calculateFromUsd = (usdValue: string) => {
-    if (price && usdValue) {
-      const usd = parseNumber(usdValue);
-      const btcValue = usd / price.usd;
-      setBtc(formatNumber(btcValue));
-      setSatoshi(formatNumber(btcValue * SATOSHI_PER_BTC));
-      setThb(formatNumber(btcValue * price.thb));
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, field: string) => {
-    if (e.key === 'Enter') {
-      const target = e.target as HTMLInputElement;
-      const value = target.value;
-      
-      switch (field) {
-        case 'thb':
-          calculateFromThb(value);
-          break;
-        case 'btc':
-          calculateFromBtc(value);
-          break;
-        case 'satoshi':
-          calculateFromSatoshi(value);
-          break;
-        case 'usd':
-          calculateFromUsd(value);
-          break;
+        setAverages({
+          avg7d: avg(last7),
+          avg30d: avg(last30),
+          avg100d: avg(last100),
+        });
+      } catch (error) {
+        console.error("Error fetching averages:", error);
       }
+    };
+
+    fetchAverages();
+  }, []);
+
+  const calculateFromThb = useCallback((thbValue: string) => {
+    if (price && thbValue) {
+      const t = parseNumber(thbValue);
+      const btcValue = t / price.thb;
+      setBtc(formatNumber(btcValue));
+      setSatoshi(formatNumber(btcValue * SATOSHI_PER_BTC));
+      setUsd(formatNumber(btcValue * price.usd));
+    } else if (!thbValue) {
+      setBtc(""); setSatoshi(""); setUsd("");
+    }
+  }, [price]);
+
+  const calculateFromBtc = useCallback((btcValue: string) => {
+    if (price && btcValue) {
+      const b = parseNumber(btcValue);
+      setSatoshi(formatNumber(b * SATOSHI_PER_BTC));
+      setUsd(formatNumber(b * price.usd));
+      setThb(formatNumber(b * price.thb));
+    } else if (!btcValue) {
+      setSatoshi(""); setUsd(""); setThb("");
+    }
+  }, [price]);
+
+  const calculateFromSatoshi = useCallback((satoshiValue: string) => {
+    if (price && satoshiValue) {
+      const s = parseNumber(satoshiValue);
+      const btcValue = s / SATOSHI_PER_BTC;
+      setBtc(formatNumber(btcValue));
+      setUsd(formatNumber(btcValue * price.usd));
+      setThb(formatNumber(btcValue * price.thb));
+    } else if (!satoshiValue) {
+      setBtc(""); setUsd(""); setThb("");
+    }
+  }, [price]);
+
+  const calculateFromUsd = useCallback((usdValue: string) => {
+    if (price && usdValue) {
+      const u = parseNumber(usdValue);
+      const btcValue = u / price.usd;
+      setBtc(formatNumber(btcValue));
+      setSatoshi(formatNumber(btcValue * SATOSHI_PER_BTC));
+      setThb(formatNumber(btcValue * price.thb));
+    } else if (!usdValue) {
+      setBtc(""); setSatoshi(""); setThb("");
+    }
+  }, [price]);
+
+  const handleChange = (value: string, field: string) => {
+    const clean = value.replace(/,/g, '');
+    if (clean !== '' && !/^\d*\.?\d*$/.test(clean)) return;
+
+    setActiveField(field);
+    switch (field) {
+      case 'thb':
+        setThb(clean);
+        calculateFromThb(clean);
+        break;
+      case 'btc':
+        setBtc(clean);
+        calculateFromBtc(clean);
+        break;
+      case 'satoshi':
+        setSatoshi(clean);
+        calculateFromSatoshi(clean);
+        break;
+      case 'usd':
+        setUsd(clean);
+        calculateFromUsd(clean);
+        break;
+    }
+  };
+
+  const handleBlur = (value: string, setter: (v: string) => void) => {
+    const clean = value.replace(/,/g, '');
+    if (clean && !isNaN(Number(clean))) {
+      setter(formatNumber(parseNumber(clean)));
     }
   };
 
@@ -169,6 +226,45 @@ const BitcoinCalculator = () => {
                   </p>
                 </div>
               </div>
+
+              {/* THB/USD Exchange Rate */}
+              {thbUsdRate && (
+                <div className="pt-3 border-t border-border/50">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">อัตราแลกเปลี่ยน THB/USD</p>
+                    <p className="text-base font-semibold text-foreground">
+                      1 USD = ฿{thbUsdRate.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* BTC Averages */}
+              {averages && (
+                <div className="pt-3 border-t border-border/50">
+                  <p className="text-sm text-muted-foreground mb-2">ราคาเฉลี่ย Bitcoin (USD)</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="text-center p-2 rounded-lg bg-muted/30">
+                      <p className="text-xs text-muted-foreground">7 วัน</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        ${averages.avg7d.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </p>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-muted/30">
+                      <p className="text-xs text-muted-foreground">30 วัน</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        ${averages.avg30d.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </p>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-muted/30">
+                      <p className="text-xs text-muted-foreground">100 วัน</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        ${averages.avg100d.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </Card>
         )}
@@ -176,7 +272,7 @@ const BitcoinCalculator = () => {
         {/* Calculator Card */}
         <Card className="p-6 bg-gradient-to-br from-card to-card/50 border-border/50 backdrop-blur">
           <div className="space-y-6">
-            <div className="grid gap-6">
+            <div className="grid gap-5">
               {/* THB */}
               <div className="space-y-2">
                 <Label htmlFor="thb" className="text-base text-foreground">
@@ -186,40 +282,12 @@ const BitcoinCalculator = () => {
                   id="thb"
                   type="text"
                   value={thb}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/,/g, '');
-                    if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                      setThb(value);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    const value = e.target.value.replace(/,/g, '');
-                    if (value && !isNaN(Number(value))) {
-                      setThb(formatNumber(parseNumber(value)));
-                    }
-                  }}
-                  onKeyPress={(e) => handleKeyPress(e, 'thb')}
+                  onChange={(e) => handleChange(e.target.value, 'thb')}
+                  onBlur={(e) => handleBlur(e.target.value, setThb)}
                   className="text-lg h-12 bg-input border-border text-foreground"
                   autoFocus
                   placeholder="กรอกจำนวนเงินบาท"
                 />
-                <div className="grid grid-cols-2 gap-2">
-                  <Button 
-                    onClick={() => calculateFromThb(thb)}
-                    className="w-full"
-                    size="lg"
-                  >
-                    คำนวณ
-                  </Button>
-                  <Button 
-                    onClick={resetFields}
-                    variant="outline"
-                    className="w-full"
-                    size="lg"
-                  >
-                    ล้างตัวเลข
-                  </Button>
-                </div>
               </div>
 
               {/* BTC */}
@@ -231,39 +299,11 @@ const BitcoinCalculator = () => {
                   id="btc"
                   type="text"
                   value={btc}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/,/g, '');
-                    if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                      setBtc(value);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    const value = e.target.value.replace(/,/g, '');
-                    if (value && !isNaN(Number(value))) {
-                      setBtc(formatNumber(parseNumber(value)));
-                    }
-                  }}
-                  onKeyPress={(e) => handleKeyPress(e, 'btc')}
+                  onChange={(e) => handleChange(e.target.value, 'btc')}
+                  onBlur={(e) => handleBlur(e.target.value, setBtc)}
                   className="text-lg h-12 bg-input border-border text-foreground"
                   placeholder="กรอกจำนวน BTC"
                 />
-                <div className="grid grid-cols-2 gap-2">
-                  <Button 
-                    onClick={() => calculateFromBtc(btc)}
-                    className="w-full"
-                    size="lg"
-                  >
-                    คำนวณ
-                  </Button>
-                  <Button 
-                    onClick={resetFields}
-                    variant="outline"
-                    className="w-full"
-                    size="lg"
-                  >
-                    ล้างตัวเลข
-                  </Button>
-                </div>
               </div>
 
               {/* Satoshi */}
@@ -275,39 +315,11 @@ const BitcoinCalculator = () => {
                   id="satoshi"
                   type="text"
                   value={satoshi}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/,/g, '');
-                    if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                      setSatoshi(value);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    const value = e.target.value.replace(/,/g, '');
-                    if (value && !isNaN(Number(value))) {
-                      setSatoshi(formatNumber(parseNumber(value)));
-                    }
-                  }}
-                  onKeyPress={(e) => handleKeyPress(e, 'satoshi')}
+                  onChange={(e) => handleChange(e.target.value, 'satoshi')}
+                  onBlur={(e) => handleBlur(e.target.value, setSatoshi)}
                   className="text-lg h-12 bg-input border-border text-foreground"
                   placeholder="กรอกจำนวน Satoshi"
                 />
-                <div className="grid grid-cols-2 gap-2">
-                  <Button 
-                    onClick={() => calculateFromSatoshi(satoshi)}
-                    className="w-full"
-                    size="lg"
-                  >
-                    คำนวณ
-                  </Button>
-                  <Button 
-                    onClick={resetFields}
-                    variant="outline"
-                    className="w-full"
-                    size="lg"
-                  >
-                    ล้างตัวเลข
-                  </Button>
-                </div>
               </div>
 
               {/* USD */}
@@ -319,41 +331,24 @@ const BitcoinCalculator = () => {
                   id="usd"
                   type="text"
                   value={usd}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/,/g, '');
-                    if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                      setUsd(value);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    const value = e.target.value.replace(/,/g, '');
-                    if (value && !isNaN(Number(value))) {
-                      setUsd(formatNumber(parseNumber(value)));
-                    }
-                  }}
-                  onKeyPress={(e) => handleKeyPress(e, 'usd')}
+                  onChange={(e) => handleChange(e.target.value, 'usd')}
+                  onBlur={(e) => handleBlur(e.target.value, setUsd)}
                   className="text-lg h-12 bg-input border-border text-foreground"
                   placeholder="กรอกจำนวนดอลลาร์"
                 />
-                <div className="grid grid-cols-2 gap-2">
-                  <Button 
-                    onClick={() => calculateFromUsd(usd)}
-                    className="w-full"
-                    size="lg"
-                  >
-                    คำนวณ
-                  </Button>
-                  <Button 
-                    onClick={resetFields}
-                    variant="outline"
-                    className="w-full"
-                    size="lg"
-                  >
-                    ล้างตัวเลข
-                  </Button>
-                </div>
               </div>
             </div>
+
+            {/* Clear Button */}
+            <Button
+              onClick={resetFields}
+              variant="outline"
+              className="w-full"
+              size="lg"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              ล้างตัวเลข
+            </Button>
 
             {/* Info */}
             <div className="pt-4 border-t border-border">
