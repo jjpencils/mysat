@@ -239,7 +239,7 @@ const BitcoinCalculator = () => {
                 </div>
               )}
 
-              {/* BTC Averages */}
+              {/* BTC Averages USD */}
               {averages && (
                 <div className="pt-3 border-t border-border/50">
                   <p className="text-sm text-muted-foreground mb-2">ราคาเฉลี่ย Bitcoin (USD)</p>
@@ -260,6 +260,33 @@ const BitcoinCalculator = () => {
                       <p className="text-xs text-muted-foreground">100 วัน</p>
                       <p className="text-sm font-semibold text-foreground">
                         ${averages.avg100d.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* BTC Averages THB */}
+              {averages && thbUsdRate && (
+                <div className="pt-3 border-t border-border/50">
+                  <p className="text-sm text-muted-foreground mb-2">ราคาเฉลี่ย Bitcoin (THB)</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="text-center p-2 rounded-lg bg-muted/30">
+                      <p className="text-xs text-muted-foreground">7 วัน</p>
+                      <p className="text-sm font-semibold text-gradient">
+                        ฿{(averages.avg7d * thbUsdRate).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </p>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-muted/30">
+                      <p className="text-xs text-muted-foreground">30 วัน</p>
+                      <p className="text-sm font-semibold text-gradient">
+                        ฿{(averages.avg30d * thbUsdRate).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </p>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-muted/30">
+                      <p className="text-xs text-muted-foreground">100 วัน</p>
+                      <p className="text-sm font-semibold text-gradient">
+                        ฿{(averages.avg100d * thbUsdRate).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                       </p>
                     </div>
                   </div>
